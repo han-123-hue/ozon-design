@@ -3,101 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Дизайн Магнита</title>
+    <title>Free AI Design Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/bundle.js"></script>
     <style>
         :root { --primary: #005bff; --accent: #ff0055; }
-        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; -webkit-tap-highlight-color: transparent; }
-        .header { background: var(--primary); color: white; width: 100%; text-align: center; padding: 15px 0; font-weight: bold; font-size: 18px; }
-        .preview-container { width: 300px; height: 300px; margin: 20px; background: white; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 4px solid white; touch-action: none; }
-        #magnet-bg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; object-fit: cover; pointer-events: none; }
-        #user-face { position: absolute; z-index: 2; width: 150px; cursor: move; touch-action: none; transform: translate(0,0); }
-        .controls { width: 85%; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
-        /* 强化按钮在手机上的点击感 */
-        .upload-wrapper { background: var(--primary); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; margin-bottom: 15px; position: relative; active: opacity: 0.8; }
-        #file-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .btn-order { display: none; background: var(--accent); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; text-decoration: none; margin-top: 10px; }
-        .tip { font-size: 13px; color: #888; text-align: center; margin-top: 10px; line-height: 1.4; }
-        #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 12px; z-index: 100; }
+        body { font-family: sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; }
+        .header { background: var(--primary); color: white; width: 100%; text-align: center; padding: 15px 0; font-weight: bold; }
+        .preview-container { width: 300px; height: 300px; margin: 20px; background: white; border-radius: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        #magnet-bg { width: 100%; height: 100%; position: absolute; z-index: 1; object-fit: cover; }
+        #user-face { position: absolute; z-index: 2; width: 150px; cursor: move; touch-action: none; display: none; }
+        .controls { width: 85%; background: white; padding: 20px; border-radius: 20px; text-align: center; }
+        .upload-btn { background: var(--primary); color: white; padding: 16px; border-radius: 12px; font-weight: bold; display: block; cursor: pointer; }
+        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div class="header">🎨 AI ЦЕНТР ДИЗАЙНА</div>
+<div class="header">🎨 БЕСПЛАТНЫЙ AI ЦЕНТР</div>
 
-<div class="preview-container" id="capture-area">
-    <img id="magnet-bg" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg" alt="bg">
-    <img id="user-face" src="" style="display: none;" alt="user">
+<div class="preview-container">
+    <img id="magnet-bg" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
+    <img id="user-face">
 </div>
 
-<div id="loading">✨ AI Обработка...</div>
+<div id="loading">✨ ИИ обрабатывает фото...<br>(Это может занять 5-10 сек)</div>
 
 <div class="controls">
-    <div class="upload-wrapper">
-        📸 ЗАГРУЗИТЬ ФОТО (上传照片)
-        <input type="file" id="file-input" accept="image/*">
-    </div>
-    
-    <p class="tip">Двигайте фото пальцем для настройки<br>(手动调整照片位置)</p>
-    
-    <a href="https://www.ozon.ru/cart" id="order-link" class="btn-order">🛒 ЗАКАЗАТЬ СЕЙЧАС</a>
+    <label class="upload-btn">
+        📸 ЗАГРУЗИТЬ ФОТО
+        <input type="file" id="file-input" accept="image/*" style="display:none">
+    </label>
+    <p style="font-size:12px; color:#666; margin-top:10px;">Бесплатно и без ограничений!</p>
 </div>
 
 <script>
     const fileInput = document.getElementById('file-input');
     const userFace = document.getElementById('user-face');
     const loading = document.getElementById('loading');
-    const orderLink = document.getElementById('order-link');
 
-    // 手机端专门优化的上传监听
-    fileInput.addEventListener('change', function(e) {
+    fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        loading.style.display = 'block';
-        
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            userFace.src = event.target.result;
-            userFace.onload = function() {
-                userFace.style.display = 'block';
-                userFace.style.top = '75px';
-                userFace.style.left = '75px';
-                loading.style.display = 'none';
-                orderLink.style.display = 'block';
-            };
-        };
-        reader.onerror = () => alert('Ошибка при загрузке. Попробуйте другое фото.');
-        reader.readAsDataURL(file);
+        loading.style.display = 'flex';
+        try {
+            // 使用 imgly 库在本地进行抠图，不产生任何API费用
+            const blob = await imglyRemoveBackground(file);
+            userFace.src = URL.createObjectURL(blob);
+            userFace.style.display = 'block';
+            userFace.style.top = '75px';
+            userFace.style.left = '75px';
+        } catch (error) {
+            alert("Ошибка загрузки. Попробуйте еще раз.");
+        } finally {
+            loading.style.display = 'none';
+        }
     });
 
-    // 手机端极致丝滑的拖拽代码
-    let isDragging = false;
-    let startX, startY, initialX, initialY;
-
+    // 拖拽逻辑保持不变...
+    let isDragging = false, startX, startY, initialX, initialY;
     userFace.addEventListener('touchstart', (e) => {
         isDragging = true;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        initialX = userFace.offsetLeft;
-        initialY = userFace.offsetTop;
-    }, {passive: true});
-
+        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+        initialX = userFace.offsetLeft; initialY = userFace.offsetTop;
+    });
     document.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        const currentX = e.touches[0].clientX;
-        const currentY = e.touches[0].clientY;
-        
-        const dx = currentX - startX;
-        const dy = currentY - startY;
-        
-        userFace.style.left = (initialX + dx) + 'px';
-        userFace.style.top = (initialY + dy) + 'px';
-    }, {passive: false});
-
-    document.addEventListener('touchend', () => {
-        isDragging = false;
+        userFace.style.left = (initialX + e.touches[0].clientX - startX) + 'px';
+        userFace.style.top = (initialY + e.touches[0].clientY - startY) + 'px';
     });
-
+    document.addEventListener('touchend', () => isDragging = false);
 </script>
 </body>
 </html>
