@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Дизайн Магнита - Твой Стиль</title>
+    <style>
+        :root { --primary: #005bff; --accent: #ff0055; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; }
+        .header { background: var(--primary); color: white; width: 100%; text-align: center; padding: 15px 0; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .preview-container { width: 320px; height: 320px; margin: 20px; background: white; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 5px solid white; }
+        #magnet-bg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; object-fit: cover; }
+        #user-face { position: absolute; z-index: 2; width: 120px; cursor: move; touch-action: none; transform-origin: center; }
+        .controls { width: 90%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+        .btn { display: block; width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; text-align: center; text-decoration: none; }
+        .btn-upload { background: var(--primary); color: white; }
+        .btn-order { background: var(--accent); color: white; display: none; }
+        .template-list { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .template-item { width: 60px; height: 60px; border-radius: 8px; border: 2px solid #ddd; cursor: pointer; flex-shrink: 0; }
+        .template-item.active { border-color: var(--primary); }
+        .tip { font-size: 12px; color: #666; text-align: center; margin-top: 10px; }
+        #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; z-index: 100; }
+    </style>
+</head>
+<body>
+
+<div class="header">🎨 AI ЦЕНТР ДИЗАЙНА OZON</div>
+
+<div class="preview-container" id="capture-area">
+    <img id="magnet-bg" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg" alt="bg">
+    <img id="user-face" src="" style="display: none;" alt="user">
+</div>
+
+<div id="loading">✨ AI Обработка (抠图)...</div>
+
+<div class="controls">
+    <label class="btn btn-upload">
+        📸 ЗАГРУЗИТЬ ФОТО (上传照片)
+        <input type="file" id="file-input" style="display: none;" accept="image/*">
+    </label>
+
+    <div style="font-size: 14px; font-weight: bold;">Выбери стиль (选择模板):</div>
+    <div class="template-list">
+        <img class="template-item active" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg" data-bg="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
+        <img class="template-item" src="https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01R3O1X1X1X1X1X1X1X_!!2210667046465.jpg" data-bg="https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01R3O1X1X1X1X1X1X1X_!!2210667046465.jpg">
+        </div>
+
+    <p class="tip">Двигай фото пальцем, чтобы настроить положение<br>(用手指拖动照片调整位置)</p>
+    
+    <a href="https://www.ozon.ru/cart" id="order-link" class="btn btn-order">🛒 ЗАКАЗАТЬ СЕЙЧАС (立即下单)</a>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+    const userFace = document.getElementById('user-face');
+    const magnetBg = document.getElementById('magnet-bg');
+    const loading = document.getElementById('loading');
+    const orderLink = document.getElementById('order-link');
+
+    // 模拟自动抠图逻辑 (由于真实抠图需要API，这里使用模拟，真实环境可接入 remove.bg API)
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        loading.style.display = 'block';
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            // 真实项目中：这里应调用 AI 抠图接口
+            // 示例中：直接显示照片，并模拟抠图完成
+            setTimeout(() => {
+                userFace.src = event.target.result;
+                userFace.style.display = 'block';
+                userFace.style.top = '100px';
+                userFace.style.left = '100px';
+                loading.style.display = 'none';
+                orderLink.style.display = 'block';
+            }, 1500);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // 模板切换逻辑
+    document.querySelectorAll('.template-item').forEach(item => {
+        item.onclick = () => {
+            document.querySelector('.template-item.active').classList.remove('active');
+            item.classList.add('active');
+            magnetBg.src = item.dataset.bg;
+        };
+    });
+
+    // 简单的拖拽实现 (适配手机端)
+    let isDragging = false;
+    userFace.ontouchstart = () => isDragging = true;
+    document.ontouchmove = (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const container = document.getElementById('capture-area').getBoundingClientRect();
+        userFace.style.left = (touch.clientX - container.left - 60) + 'px';
+        userFace.style.top = (touch.clientY - container.top - 60) + 'px';
+    };
+    document.ontouchend = () => isDragging = false;
+
+</script>
+</body>
+</html>
