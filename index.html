@@ -3,96 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Custom Master</title>
+    <title>AI Master Design</title>
     <style>
-        :root { --main-blue: #005bff; --bg-dark: #121212; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-dark); color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* 1. 验证遮罩层 (模拟形白订单验证) */
-        #auth-overlay { position: fixed; inset: 0; background: var(--bg-dark); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .input-box { background: #222; border: 1px solid #444; color: white; padding: 15px; width: 80%; border-radius: 10px; text-align: center; margin-bottom: 20px; outline: none; }
-        .btn-verify { background: var(--main-blue); color: white; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-
-        /* 2. 主画布区 */
+        :root { --ozon-blue: #005bff; --dark-bg: #121212; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--dark-bg); color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .app-bar { background: #1e1e1e; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
         .canvas-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        #capture-box { width: 320px; height: 320px; background: white; border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
-        #bg-tpl { width: 100%; height: 100%; object-fit: cover; }
+        #capture-box { width: 320px; height: 320px; background: white; border-radius: 12px; overflow: hidden; position: relative; }
+        #bg-tpl { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         #user-img { position: absolute; width: 150px; top: 50px; left: 80px; touch-action: none; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4)); display: none; }
-
-        /* 3. 底部模版库 (形白同款滚动条) */
         .tpl-scroll { height: 90px; background: #1e1e1e; display: flex; align-items: center; overflow-x: auto; padding: 0 15px; gap: 12px; }
-        .tpl-item { width: 60px; height: 60px; border-radius: 8px; flex-shrink: 0; border: 2px solid transparent; overflow: hidden; opacity: 0.6; transition: 0.3s; }
-        .tpl-item.active { border-color: var(--main-blue); opacity: 1; transform: scale(1.1); }
+        .tpl-item { width: 60px; height: 60px; border-radius: 8px; flex-shrink: 0; border: 2px solid transparent; overflow: hidden; opacity: 0.6; }
+        .tpl-item.active { border-color: var(--ozon-blue); opacity: 1; transform: scale(1.1); }
         .tpl-item img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* 4. 操作区 */
         .panel { background: #1e1e1e; padding: 20px; border-top: 1px solid #333; }
-        .btn-up { background: var(--main-blue); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; position: relative; cursor: pointer; }
+        .btn-up { background: var(--ozon-blue); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; position: relative; cursor: pointer; }
         #loading { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-
-<div id="auth-overlay">
-    <h3 style="margin-bottom: 30px;">Введите номер заказа<br>(请输入订单号)</h3>
-    <input type="text" id="order-id" class="input-box" placeholder="Order ID / 暗号">
-    <div class="btn-verify" onclick="verifyOrder()">ВОЙТИ (进入)</div>
-    <p style="font-size: 11px; color: #666; margin-top: 20px;">Доступно только для покупателей Ozon</p>
-</div>
-
-<div class="canvas-area">
-    <div id="capture-box">
-        <img id="bg-tpl" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
-        <img id="user-img">
-    </div>
-</div>
-
-<div class="tpl-scroll" id="tpl-list">
+<div class="app-bar">🎨 AI ЦЕНТР ПЕРСОНАЛИЗАЦИИ</div>
+<div class="canvas-area"><div id="capture-box"><img id="bg-tpl" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg"><img id="user-img"></div></div>
+<div class="tpl-scroll">
     <div class="tpl-item active" onclick="changeBg('https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg"></div>
     <div class="tpl-item" onclick="changeBg('https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg"></div>
-    <div class="tpl-item" onclick="changeBg('https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01pXv1r1X1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01pXv1r1X1X1X1X1X1X1X_!!2210667046465.jpg"></div>
 </div>
-
-<div class="panel">
-    <div class="btn-up">
-        📸 ЗАГРУЗИТЬ ФОТО (上传照片)
-        <input type="file" id="up-file" accept="image/*" style="position:absolute; inset:0; opacity:0; cursor:pointer;">
-    </div>
-    <p style="text-align:center; font-size:11px; color:#666; margin-top:10px;">Двигайте и масштабируйте двумя пальцами</p>
-</div>
-
-<div id="loading">🚀 ОБРАБОТКА...</div>
-
+<div class="panel"><div class="btn-up">📸 ЗАГРУЗИТЬ ФОТО (上传照片)<input type="file" id="up-file" accept="image/*" style="position:absolute; inset:0; opacity:0;"></div></div>
+<div id="loading">🚀 AI ОБРАБОТКА...</div>
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script>
+    // ⬇️ 恩人，这里填你从 Remove.bg 拿到的密钥！
     const API_KEY = 'd12kqQkrNx9hZgF6ZRU8MSmA'; 
 
-    // 1. 简易验证功能
-    function verifyOrder() {
-        const val = document.getElementById('order-id').value;
-        if(val.length > 3) { // 只要长度大于3就让进，你可以改成特定暗号
-            document.getElementById('auth-overlay').style.display = 'none';
-        } else {
-            alert('Неверный код (订单号无效)');
-        }
-    }
-
-    // 2. 模版切换
     function changeBg(url, el) {
         document.getElementById('bg-tpl').src = url;
         document.querySelectorAll('.tpl-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
     }
 
-    // 3. AI 抠图
     document.getElementById('up-file').onchange = async (e) => {
         const file = e.target.files[0];
         if(!file) return;
         document.getElementById('loading').style.display = 'flex';
-        
         const fd = new FormData();
         fd.append('image_file', file);
-        
         try {
             const res = await fetch('https://api.remove.bg/v1.0/removebg', {
                 method: 'POST',
@@ -104,13 +58,10 @@
                 const img = document.getElementById('user-img');
                 img.src = URL.createObjectURL(blob);
                 img.style.display = 'block';
-            }
-        } finally {
-            document.getElementById('loading').style.display = 'none';
-        }
+            } else { alert('Ошибка AI: Проверьте ключ (密钥错误或用尽)'); }
+        } finally { document.getElementById('loading').style.display = 'none'; }
     };
 
-    // 4. 手势缩放旋转功能 (与形白体验一致)
     let angle = 0, scale = 1;
     interact('#user-img').gesturable({
         onmove: (ev) => {
