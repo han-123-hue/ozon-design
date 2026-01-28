@@ -2,104 +2,101 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Дизайн Магнита - Твой Стиль</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Дизайн Магнита</title>
     <style>
         :root { --primary: #005bff; --accent: #ff0055; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; }
-        .header { background: var(--primary); color: white; width: 100%; text-align: center; padding: 15px 0; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .preview-container { width: 320px; height: 320px; margin: 20px; background: white; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 5px solid white; }
-        #magnet-bg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; object-fit: cover; }
-        #user-face { position: absolute; z-index: 2; width: 120px; cursor: move; touch-action: none; transform-origin: center; }
-        .controls { width: 90%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
-        .btn { display: block; width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; text-align: center; text-decoration: none; }
-        .btn-upload { background: var(--primary); color: white; }
-        .btn-order { background: var(--accent); color: white; display: none; }
-        .template-list { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .template-item { width: 60px; height: 60px; border-radius: 8px; border: 2px solid #ddd; cursor: pointer; flex-shrink: 0; }
-        .template-item.active { border-color: var(--primary); }
-        .tip { font-size: 12px; color: #666; text-align: center; margin-top: 10px; }
-        #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; z-index: 100; }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; -webkit-tap-highlight-color: transparent; }
+        .header { background: var(--primary); color: white; width: 100%; text-align: center; padding: 15px 0; font-weight: bold; font-size: 18px; }
+        .preview-container { width: 300px; height: 300px; margin: 20px; background: white; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 4px solid white; touch-action: none; }
+        #magnet-bg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; object-fit: cover; pointer-events: none; }
+        #user-face { position: absolute; z-index: 2; width: 150px; cursor: move; touch-action: none; transform: translate(0,0); }
+        .controls { width: 85%; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        /* 强化按钮在手机上的点击感 */
+        .upload-wrapper { background: var(--primary); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; margin-bottom: 15px; position: relative; active: opacity: 0.8; }
+        #file-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .btn-order { display: none; background: var(--accent); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; text-decoration: none; margin-top: 10px; }
+        .tip { font-size: 13px; color: #888; text-align: center; margin-top: 10px; line-height: 1.4; }
+        #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 12px; z-index: 100; }
     </style>
 </head>
 <body>
 
-<div class="header">🎨 AI ЦЕНТР ДИЗАЙНА OZON</div>
+<div class="header">🎨 AI ЦЕНТР ДИЗАЙНА</div>
 
 <div class="preview-container" id="capture-area">
     <img id="magnet-bg" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg" alt="bg">
     <img id="user-face" src="" style="display: none;" alt="user">
 </div>
 
-<div id="loading">✨ AI Обработка (抠图)...</div>
+<div id="loading">✨ AI Обработка...</div>
 
 <div class="controls">
-    <label class="btn btn-upload">
+    <div class="upload-wrapper">
         📸 ЗАГРУЗИТЬ ФОТО (上传照片)
-        <input type="file" id="file-input" style="display: none;" accept="image/*">
-    </label>
-
-    <div style="font-size: 14px; font-weight: bold;">Выбери стиль (选择模板):</div>
-    <div class="template-list">
-        <img class="template-item active" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg" data-bg="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
-        <img class="template-item" src="https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01R3O1X1X1X1X1X1X1X_!!2210667046465.jpg" data-bg="https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01R3O1X1X1X1X1X1X1X_!!2210667046465.jpg">
-        </div>
-
-    <p class="tip">Двигай фото пальцем, чтобы настроить положение<br>(用手指拖动照片调整位置)</p>
+        <input type="file" id="file-input" accept="image/*">
+    </div>
     
-    <a href="https://www.ozon.ru/cart" id="order-link" class="btn btn-order">🛒 ЗАКАЗАТЬ СЕЙЧАС (立即下单)</a>
+    <p class="tip">Двигайте фото пальцем для настройки<br>(手动调整照片位置)</p>
+    
+    <a href="https://www.ozon.ru/cart" id="order-link" class="btn-order">🛒 ЗАКАЗАТЬ СЕЙЧАС</a>
 </div>
 
 <script>
     const fileInput = document.getElementById('file-input');
     const userFace = document.getElementById('user-face');
-    const magnetBg = document.getElementById('magnet-bg');
     const loading = document.getElementById('loading');
     const orderLink = document.getElementById('order-link');
 
-    // 模拟自动抠图逻辑 (由于真实抠图需要API，这里使用模拟，真实环境可接入 remove.bg API)
-    fileInput.onchange = (e) => {
+    // 手机端专门优化的上传监听
+    fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
 
         loading.style.display = 'block';
         
         const reader = new FileReader();
-        reader.onload = (event) => {
-            // 真实项目中：这里应调用 AI 抠图接口
-            // 示例中：直接显示照片，并模拟抠图完成
-            setTimeout(() => {
-                userFace.src = event.target.result;
+        reader.onload = function(event) {
+            userFace.src = event.target.result;
+            userFace.onload = function() {
                 userFace.style.display = 'block';
-                userFace.style.top = '100px';
-                userFace.style.left = '100px';
+                userFace.style.top = '75px';
+                userFace.style.left = '75px';
                 loading.style.display = 'none';
                 orderLink.style.display = 'block';
-            }, 1500);
+            };
         };
+        reader.onerror = () => alert('Ошибка при загрузке. Попробуйте другое фото.');
         reader.readAsDataURL(file);
-    };
-
-    // 模板切换逻辑
-    document.querySelectorAll('.template-item').forEach(item => {
-        item.onclick = () => {
-            document.querySelector('.template-item.active').classList.remove('active');
-            item.classList.add('active');
-            magnetBg.src = item.dataset.bg;
-        };
     });
 
-    // 简单的拖拽实现 (适配手机端)
+    // 手机端极致丝滑的拖拽代码
     let isDragging = false;
-    userFace.ontouchstart = () => isDragging = true;
-    document.ontouchmove = (e) => {
+    let startX, startY, initialX, initialY;
+
+    userFace.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        initialX = userFace.offsetLeft;
+        initialY = userFace.offsetTop;
+    }, {passive: true});
+
+    document.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        const touch = e.touches[0];
-        const container = document.getElementById('capture-area').getBoundingClientRect();
-        userFace.style.left = (touch.clientX - container.left - 60) + 'px';
-        userFace.style.top = (touch.clientY - container.top - 60) + 'px';
-    };
-    document.ontouchend = () => isDragging = false;
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        
+        const dx = currentX - startX;
+        const dy = currentY - startY;
+        
+        userFace.style.left = (initialX + dx) + 'px';
+        userFace.style.top = (initialY + dy) + 'px';
+    }, {passive: false});
+
+    document.addEventListener('touchend', () => {
+        isDragging = false;
+    });
 
 </script>
 </body>
