@@ -3,45 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Master Design</title>
+    <title>AI Magnet Designer Pro</title>
     <style>
-        :root { --ozon-blue: #005bff; --dark-bg: #121212; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--dark-bg); color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .app-bar { background: #1e1e1e; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
-        .canvas-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        #capture-box { width: 320px; height: 320px; background: white; border-radius: 12px; overflow: hidden; position: relative; }
-        #bg-tpl { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-        #user-img { position: absolute; width: 150px; top: 50px; left: 80px; touch-action: none; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4)); display: none; }
-        .tpl-scroll { height: 90px; background: #1e1e1e; display: flex; align-items: center; overflow-x: auto; padding: 0 15px; gap: 12px; }
-        .tpl-item { width: 60px; height: 60px; border-radius: 8px; flex-shrink: 0; border: 2px solid transparent; overflow: hidden; opacity: 0.6; }
-        .tpl-item.active { border-color: var(--ozon-blue); opacity: 1; transform: scale(1.1); }
-        .tpl-item img { width: 100%; height: 100%; object-fit: cover; }
-        .panel { background: #1e1e1e; padding: 20px; border-top: 1px solid #333; }
-        .btn-up { background: var(--ozon-blue); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; position: relative; cursor: pointer; }
+        :root { --ozon-blue: #005bff; --action-pink: #f91155; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: #121212; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* 顶部装饰 */
+        .header { background: #1e1e1e; padding: 15px; text-align: center; font-size: 14px; border-bottom: 1px solid #333; color: #aaa; }
+
+        /* 画布区 - 模仿专业作图软件 */
+        .canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 10px; }
+        #magnet-canvas { width: 340px; height: 340px; background: #fff; border-radius: 15px; position: relative; overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        
+        /* 模版层 (在上) */
+        #tpl-img { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; }
+        
+        /* 用户照片层 (在下) */
+        #user-img { position: absolute; top: 50px; left: 80px; width: 160px; z-index: 5; touch-action: none; display: none; filter: drop-shadow(0 0 10px rgba(0,0,0,0.2)); }
+
+        /* 底部模版滑动栏 */
+        .tpl-selector { height: 100px; background: #1e1e1e; display: flex; align-items: center; overflow-x: auto; padding: 0 15px; gap: 12px; border-top: 1px solid #333; }
+        .tpl-thumb { width: 65px; height: 65px; border-radius: 10px; border: 2px solid transparent; flex-shrink: 0; overflow: hidden; transition: 0.2s; opacity: 0.6; }
+        .tpl-thumb.active { border-color: var(--ozon-blue); opacity: 1; transform: scale(1.1); }
+        .tpl-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 控制台 */
+        .footer { padding: 20px; background: #1e1e1e; display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; cursor: pointer; text-decoration: none; }
+        .btn-blue { background: var(--ozon-blue); color: white; }
+        .btn-pink { background: var(--action-pink); color: white; display: none; }
+        
         #loading { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-<div class="app-bar">🎨 AI ЦЕНТР ПЕРСОНАЛИЗАЦИИ</div>
-<div class="canvas-area"><div id="capture-box"><img id="bg-tpl" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg"><img id="user-img"></div></div>
-<div class="tpl-scroll">
-    <div class="tpl-item active" onclick="changeBg('https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg"></div>
-    <div class="tpl-item" onclick="changeBg('https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg"></div>
+
+<div class="header">САМ СЕБЕ ДИЗАЙНЕР • AI MAGNET</div>
+
+<div class="canvas-container">
+    <div id="magnet-canvas">
+        <img id="tpl-img" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
+        <img id="user-img">
+    </div>
 </div>
-<div class="panel"><div class="btn-up">📸 ЗАГРУЗИТЬ ФОТО (上传照片)<input type="file" id="up-file" accept="image/*" style="position:absolute; inset:0; opacity:0;"></div></div>
-<div id="loading">🚀 AI ОБРАБОТКА...</div>
+
+<div class="tpl-selector">
+    <div class="tpl-thumb active" onclick="setTpl('https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg', this)">
+        <img src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
+    </div>
+    <div class="tpl-thumb" onclick="setTpl('https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg', this)">
+        <img src="https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg">
+    </div>
+</div>
+
+<div class="footer">
+    <label class="btn btn-blue">
+        📸 ЗАГРУЗИТЬ ФОТО (上传照片)
+        <input type="file" id="file-input" accept="image/*" style="display:none">
+    </label>
+    <div id="save-btn" class="btn btn-pink" onclick="alert('Сделайте скриншот и отправьте нам! (请截图发送给客服)')">✅ ГОТОВО (完成设计)</div>
+    <p style="font-size: 11px; color: #666; text-align: center;">Используйте два пальца для масштабирования<br>(双指捏合缩放/旋转照片)</p>
+</div>
+
+<div id="loading">🚀 AI КРЕМЛИ...</div>
+
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script>
-    // ⬇️ 恩人，这里填你从 Remove.bg 拿到的密钥！
+    // ⬇️ 恩人，这里还是填你的密钥！
     const API_KEY = 'd12kqQkrNx9hZgF6ZRU8MSmA'; 
 
-    function changeBg(url, el) {
-        document.getElementById('bg-tpl').src = url;
-        document.querySelectorAll('.tpl-item').forEach(i => i.classList.remove('active'));
+    function setTpl(url, el) {
+        document.getElementById('tpl-img').src = url;
+        document.querySelectorAll('.tpl-thumb').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
     }
 
-    document.getElementById('up-file').onchange = async (e) => {
+    document.getElementById('file-input').onchange = async (e) => {
         const file = e.target.files[0];
         if(!file) return;
         document.getElementById('loading').style.display = 'flex';
@@ -58,10 +95,14 @@
                 const img = document.getElementById('user-img');
                 img.src = URL.createObjectURL(blob);
                 img.style.display = 'block';
-            } else { alert('Ошибка AI: Проверьте ключ (密钥错误或用尽)'); }
-        } finally { document.getElementById('loading').style.display = 'none'; }
+                document.getElementById('save-btn').style.display = 'block';
+            }
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
     };
 
+    // 核心作图功能：双指捏合缩放、旋转、移动
     let angle = 0, scale = 1;
     interact('#user-img').gesturable({
         onmove: (ev) => {
