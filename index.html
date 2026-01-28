@@ -3,70 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Xingbai-Style Design Center</title>
+    <title>AI Custom Master</title>
     <style>
-        :root { --ozon-blue: #005bff; --dark-bg: #1a1a1a; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; height: 100vh; }
+        :root { --main-blue: #005bff; --bg-dark: #121212; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-dark); color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* 顶部标题栏 */
-        .app-bar { background: white; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #ddd; }
-        
-        /* 主画布区 - 模仿形白的悬浮感 */
-        .canvas-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        #capture-area { width: 320px; height: 320px; background: white; border-radius: 12px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #bg-img { width: 100%; height: 100%; object-fit: cover; }
-        #user-photo { position: absolute; width: 150px; cursor: move; touch-action: none; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); display: none; }
+        /* 1. 验证遮罩层 (模拟形白订单验证) */
+        #auth-overlay { position: fixed; inset: 0; background: var(--bg-dark); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .input-box { background: #222; border: 1px solid #444; color: white; padding: 15px; width: 80%; border-radius: 10px; text-align: center; margin-bottom: 20px; outline: none; }
+        .btn-verify { background: var(--main-blue); color: white; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; }
 
-        /* 模版分类滑动条 */
-        .category-bar { background: white; padding: 10px 0; overflow-x: auto; white-space: nowrap; border-top: 1px solid #eee; }
-        .template-card { width: 60px; height: 60px; margin: 0 8px; border-radius: 8px; border: 2px solid transparent; display: inline-block; overflow: hidden; }
-        .template-card.active { border-color: var(--ozon-blue); }
-        .template-card img { width: 100%; height: 100%; object-fit: cover; }
+        /* 2. 主画布区 */
+        .canvas-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        #capture-box { width: 320px; height: 320px; background: white; border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        #bg-tpl { width: 100%; height: 100%; object-fit: cover; }
+        #user-img { position: absolute; width: 150px; top: 50px; left: 80px; touch-action: none; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4)); display: none; }
 
-        /* 底部操作区 */
-        .action-sheet { background: white; padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
-        .btn-upload { background: var(--ozon-blue); color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; cursor: pointer; }
-        
-        #loading { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+        /* 3. 底部模版库 (形白同款滚动条) */
+        .tpl-scroll { height: 90px; background: #1e1e1e; display: flex; align-items: center; overflow-x: auto; padding: 0 15px; gap: 12px; }
+        .tpl-item { width: 60px; height: 60px; border-radius: 8px; flex-shrink: 0; border: 2px solid transparent; overflow: hidden; opacity: 0.6; transition: 0.3s; }
+        .tpl-item.active { border-color: var(--main-blue); opacity: 1; transform: scale(1.1); }
+        .tpl-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 4. 操作区 */
+        .panel { background: #1e1e1e; padding: 20px; border-top: 1px solid #333; }
+        .btn-up { background: var(--main-blue); color: white; padding: 16px; border-radius: 12px; text-align: center; font-weight: bold; position: relative; cursor: pointer; }
+        #loading { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div class="app-bar">🎨 ЦЕНТР ПЕРСОНАЛИЗАЦИИ</div>
+<div id="auth-overlay">
+    <h3 style="margin-bottom: 30px;">Введите номер заказа<br>(请输入订单号)</h3>
+    <input type="text" id="order-id" class="input-box" placeholder="Order ID / 暗号">
+    <div class="btn-verify" onclick="verifyOrder()">ВОЙТИ (进入)</div>
+    <p style="font-size: 11px; color: #666; margin-top: 20px;">Доступно только для покупателей Ozon</p>
+</div>
 
-<div class="canvas-wrapper">
-    <div id="capture-area">
-        <img id="bg-img" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
-        <img id="user-photo" src="">
+<div class="canvas-area">
+    <div id="capture-box">
+        <img id="bg-tpl" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
+        <img id="user-img">
     </div>
 </div>
 
-<div class="category-bar">
-    <div class="template-card active" onclick="setBg('https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg"></div>
-    <div class="template-card" onclick="setBg('https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg"></div>
-    </div>
-
-<div class="action-sheet">
-    <label class="btn-upload">
-        📸 ВЫБРАТЬ ФОТО (选择照片)
-        <input type="file" id="upload" accept="image/*" style="display:none">
-    </label>
-    <p style="text-align:center; font-size:12px; color:#888; margin-top:10px;">Двигайте и масштабируйте фото пальцами</p>
+<div class="tpl-scroll" id="tpl-list">
+    <div class="tpl-item active" onclick="changeBg('https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg"></div>
+    <div class="tpl-item" onclick="changeBg('https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg"></div>
+    <div class="tpl-item" onclick="changeBg('https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01pXv1r1X1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01pXv1r1X1X1X1X1X1X1X_!!2210667046465.jpg"></div>
 </div>
 
-<div id="loading">🚀 AI ОБРАБОТКА...</div>
+<div class="panel">
+    <div class="btn-up">
+        📸 ЗАГРУЗИТЬ ФОТО (上传照片)
+        <input type="file" id="up-file" accept="image/*" style="position:absolute; inset:0; opacity:0; cursor:pointer;">
+    </div>
+    <p style="text-align:center; font-size:11px; color:#666; margin-top:10px;">Двигайте и масштабируйте двумя пальцами</p>
+</div>
+
+<div id="loading">🚀 ОБРАБОТКА...</div>
 
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script>
-    const API_KEY = 'YOUR_KEY'; // 填入你的 Remove.bg Key
-    
-    function setBg(url, el) {
-        document.getElementById('bg-img').src = url;
-        document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+    const API_KEY = 'd12kqQkrNx9hZgF6ZRU8MSmA'; 
+
+    // 1. 简易验证功能
+    function verifyOrder() {
+        const val = document.getElementById('order-id').value;
+        if(val.length > 3) { // 只要长度大于3就让进，你可以改成特定暗号
+            document.getElementById('auth-overlay').style.display = 'none';
+        } else {
+            alert('Неверный код (订单号无效)');
+        }
+    }
+
+    // 2. 模版切换
+    function changeBg(url, el) {
+        document.getElementById('bg-tpl').src = url;
+        document.querySelectorAll('.tpl-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
     }
 
-    document.getElementById('upload').onchange = async (e) => {
+    // 3. AI 抠图
+    document.getElementById('up-file').onchange = async (e) => {
         const file = e.target.files[0];
         if(!file) return;
         document.getElementById('loading').style.display = 'flex';
@@ -82,18 +101,18 @@
             });
             if(res.ok) {
                 const blob = await res.blob();
-                const photo = document.getElementById('user-photo');
-                photo.src = URL.createObjectURL(blob);
-                photo.style.display = 'block';
+                const img = document.getElementById('user-img');
+                img.src = URL.createObjectURL(blob);
+                img.style.display = 'block';
             }
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
     };
 
-    // 完美复刻形白的缩放旋转手势
+    // 4. 手势缩放旋转功能 (与形白体验一致)
     let angle = 0, scale = 1;
-    interact('#user-photo').gesturable({
+    interact('#user-img').gesturable({
         onmove: (ev) => {
             scale *= (1 + ev.ds);
             angle += ev.da;
@@ -103,8 +122,8 @@
         onmove: (ev) => {
             const x = (parseFloat(ev.target.dataset.x) || 0) + ev.dx;
             const y = (parseFloat(ev.target.dataset.y) || 0) + ev.dy;
-            ev.target.style.left = `${75 + x}px`;
-            ev.target.style.top = `${75 + y}px`;
+            ev.target.style.left = `${80 + x}px`;
+            ev.target.style.top = `${50 + y}px`;
             ev.target.dataset.x = x;
             ev.target.dataset.y = y;
         }
