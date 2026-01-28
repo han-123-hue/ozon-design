@@ -3,121 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Master Design</title>
+    <title>Xingbai-Style Design Center</title>
     <style>
-        :root { --ozon-blue: #005bff; --ozon-pink: #f91155; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: #f4f6f9; display: flex; flex-direction: column; align-items: center; overflow: hidden; height: 100vh; }
+        :root { --ozon-blue: #005bff; --dark-bg: #1a1a1a; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; height: 100vh; }
         
-        /* 顶部导航 */
-        .nav { width: 100%; background: var(--ozon-blue); color: white; text-align: center; padding: 15px 0; font-weight: bold; font-size: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-
-        /* 画布区域 */
-        #capture-area { width: 340px; height: 340px; margin: 20px auto; background: white; border-radius: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 4px solid white; touch-action: none; }
-        #bg-template { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-        #user-face { position: absolute; top: 80px; left: 100px; width: 120px; cursor: move; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); touch-action: none; display: none; }
-
-        /* 模板选择器 */
-        .scroll-box { width: 100%; padding: 10px 0; display: flex; overflow-x: auto; white-space: nowrap; gap: 15px; padding-left: 20px; }
-        .template-item { width: 70px; height: 70px; border-radius: 12px; border: 3px solid transparent; flex-shrink: 0; object-fit: cover; }
-        .template-item.active { border-color: var(--ozon-blue); transform: scale(1.05); }
-
-        /* 控制区 */
-        .controls { width: 90%; background: white; border-radius: 25px; padding: 20px; margin-top: auto; margin-bottom: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
-        .btn-main { background: var(--ozon-blue); color: white; padding: 16px; border-radius: 15px; text-align: center; font-weight: bold; position: relative; cursor: pointer; }
-        .btn-order { display: none; background: var(--ozon-pink); color: white; padding: 16px; border-radius: 15px; text-align: center; font-weight: bold; text-decoration: none; animation: pulse 2s infinite; }
+        /* 顶部标题栏 */
+        .app-bar { background: white; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #ddd; }
         
-        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; color: white; flex-direction: column; align-items: center; justify-content: center; }
-        .spinner { width: 30px; height: 30px; border: 3px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        /* 主画布区 - 模仿形白的悬浮感 */
+        .canvas-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        #capture-area { width: 320px; height: 320px; background: white; border-radius: 12px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #bg-img { width: 100%; height: 100%; object-fit: cover; }
+        #user-photo { position: absolute; width: 150px; cursor: move; touch-action: none; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); display: none; }
+
+        /* 模版分类滑动条 */
+        .category-bar { background: white; padding: 10px 0; overflow-x: auto; white-space: nowrap; border-top: 1px solid #eee; }
+        .template-card { width: 60px; height: 60px; margin: 0 8px; border-radius: 8px; border: 2px solid transparent; display: inline-block; overflow: hidden; }
+        .template-card.active { border-color: var(--ozon-blue); }
+        .template-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 底部操作区 */
+        .action-sheet { background: white; padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        .btn-upload { background: var(--ozon-blue); color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; cursor: pointer; }
+        
+        #loading { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div class="nav">🎨 AI КРЕАТИВ-ЦЕНТР</div>
+<div class="app-bar">🎨 ЦЕНТР ПЕРСОНАЛИЗАЦИИ</div>
 
-<div id="capture-area">
-    <img id="bg-template" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
-    <img id="user-face" src="">
-</div>
-
-<div class="scroll-box">
-    <img class="template-item active" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg" onclick="changeBg(this.src, this)">
-    <img class="template-item" src="https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg" onclick="changeBg(this.src, this)">
-    <img class="template-item" src="https://img.alicdn.com/imgextra/i3/2210667046465/O1CN01pXv1r1X1X1X1X1X1X1X_!!2210667046465.jpg" onclick="changeBg(this.src, this)">
-</div>
-
-<div class="controls">
-    <div class="btn-main">
-        📸 ЗАГРУЗИТЬ ФОТО (上传照片)
-        <input type="file" id="file-input" accept="image/*" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;">
+<div class="canvas-wrapper">
+    <div id="capture-area">
+        <img id="bg-img" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
+        <img id="user-photo" src="">
     </div>
-    <a href="https://www.ozon.ru/cart" id="order-link" class="btn-order">🛒 КУПИТЬ СЕЙЧАС (立即购买)</a>
-    <p style="text-align:center; font-size:11px; color:#999;">Используйте два пальца для масштабирования<br>(双指缩放和旋转照片)</p>
 </div>
 
-<div id="loading"><div class="spinner"></div><span>AI ОБРАБОТКА...</span></div>
+<div class="category-bar">
+    <div class="template-card active" onclick="setBg('https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg"></div>
+    <div class="template-card" onclick="setBg('https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg', this)"><img src="https://img.alicdn.com/imgextra/i2/2210667046465/O1CN016pXv1r1X1X1X1X1X1X_!!2210667046465.jpg"></div>
+    </div>
+
+<div class="action-sheet">
+    <label class="btn-upload">
+        📸 ВЫБРАТЬ ФОТО (选择照片)
+        <input type="file" id="upload" accept="image/*" style="display:none">
+    </label>
+    <p style="text-align:center; font-size:12px; color:#888; margin-top:10px;">Двигайте и масштабируйте фото пальцами</p>
+</div>
+
+<div id="loading">🚀 AI ОБРАБОТКА...</div>
 
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-
 <script>
-    const API_KEY = 'd12kqQkrNx9hZgF6ZRU8MSmA'; // ⬅️ 恩人，这里还是得填 Remove.bg 的 Key
-    const face = document.getElementById('user-face');
-    const loading = document.getElementById('loading');
-
-    // 1. 切换模板功能
-    function changeBg(url, el) {
-        document.getElementById('bg-template').src = url;
-        document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
+    const API_KEY = 'YOUR_KEY'; // 填入你的 Remove.bg Key
+    
+    function setBg(url, el) {
+        document.getElementById('bg-img').src = url;
+        document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
     }
 
-    // 2. AI 抠图功能
-    document.getElementById('file-input').onchange = async (e) => {
+    document.getElementById('upload').onchange = async (e) => {
         const file = e.target.files[0];
-        if (!file) return;
-        loading.style.display = 'flex';
-
-        const formData = new FormData();
-        formData.append('image_file', file);
-        formData.append('size', 'auto');
-
+        if(!file) return;
+        document.getElementById('loading').style.display = 'flex';
+        
+        const fd = new FormData();
+        fd.append('image_file', file);
+        
         try {
             const res = await fetch('https://api.remove.bg/v1.0/removebg', {
                 method: 'POST',
-                headers: { 'X-Api-Key': API_KEY },
-                body: formData
+                headers: {'X-Api-Key': API_KEY},
+                body: fd
             });
-            if (res.ok) {
+            if(res.ok) {
                 const blob = await res.blob();
-                face.src = URL.createObjectURL(blob);
-                face.style.display = 'block';
-                document.getElementById('order-link').style.display = 'block';
+                const photo = document.getElementById('user-photo');
+                photo.src = URL.createObjectURL(blob);
+                photo.style.display = 'block';
             }
         } finally {
-            loading.style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
         }
     };
 
-    // 3. 神级功能：双指缩放、旋转、移动
+    // 完美复刻形白的缩放旋转手势
     let angle = 0, scale = 1;
-    interact('#user-face').gesturable({
-        onmove: (event) => {
-            scale = scale * (1 + event.ds);
-            angle += event.da;
-            face.style.transform = `scale(${scale}) rotate(${angle}deg)`;
+    interact('#user-photo').gesturable({
+        onmove: (ev) => {
+            scale *= (1 + ev.ds);
+            angle += ev.da;
+            ev.target.style.transform = `scale(${scale}) rotate(${angle}deg)`;
         }
     }).draggable({
-        onmove: (event) => {
-            const x = (parseFloat(face.getAttribute('data-x')) || 0) + event.dx;
-            const y = (parseFloat(face.getAttribute('data-y')) || 0) + event.dy;
-            face.style.left = `${100 + x}px`;
-            face.style.top = `${80 + y}px`;
-            face.setAttribute('data-x', x);
-            face.setAttribute('data-y', y);
+        onmove: (ev) => {
+            const x = (parseFloat(ev.target.dataset.x) || 0) + ev.dx;
+            const y = (parseFloat(ev.target.dataset.y) || 0) + ev.dy;
+            ev.target.style.left = `${75 + x}px`;
+            ev.target.style.top = `${75 + y}px`;
+            ev.target.dataset.x = x;
+            ev.target.dataset.y = y;
         }
     });
 </script>
 </body>
 </html>
-
