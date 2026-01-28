@@ -3,43 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free AI Design Pro</title>
+    <title>AI Design Center</title>
     <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/bundle.js"></script>
     <style>
         :root { --primary: #005bff; --accent: #ff0055; }
         body { font-family: sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; }
         .header { background: var(--primary); color: white; width: 100%; text-align: center; padding: 15px 0; font-weight: bold; }
-        .preview-container { width: 300px; height: 300px; margin: 20px; background: white; border-radius: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .preview-container { width: 320px; height: 320px; margin: 20px; background: white; border-radius: 20px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; border: 4px solid white; }
         #magnet-bg { width: 100%; height: 100%; position: absolute; z-index: 1; object-fit: cover; }
-        #user-face { position: absolute; z-index: 2; width: 150px; cursor: move; touch-action: none; display: none; }
-        .controls { width: 85%; background: white; padding: 20px; border-radius: 20px; text-align: center; }
-        .upload-btn { background: var(--primary); color: white; padding: 16px; border-radius: 12px; font-weight: bold; display: block; cursor: pointer; }
-        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+        #user-face { position: absolute; z-index: 2; width: 140px; cursor: move; touch-action: none; display: none; }
+        .controls { width: 85%; background: white; padding: 25px; border-radius: 24px; text-align: center; }
+        .upload-btn { background: var(--primary); color: white; padding: 18px; border-radius: 15px; font-weight: bold; display: block; cursor: pointer; position: relative; }
+        #file-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,91,255,0.9); color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #fff; border-top: 4px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="header">🎨 БЕСПЛАТНЫЙ AI ЦЕНТР</div>
+<div class="header">🎨 AI ЦЕНТР ДИЗАЙНА</div>
 
 <div class="preview-container">
     <img id="magnet-bg" src="https://img.alicdn.com/imgextra/i4/2210667046465/O1CN01Zp1X1X1X1X1X1X1X1X_!!2210667046465.jpg">
-    <img id="user-face">
+    <img id="user-face" alt="user">
 </div>
 
-<div id="loading">✨ ИИ обрабатывает фото...<br>(Это может занять 5-10 сек)</div>
+<div id="loading">
+    <div class="spinner"></div>
+    <div style="font-weight: bold;">✨ ИИ УДАЛЯЕТ ФОН...</div>
+    <div style="font-size: 12px; margin-top: 10px; padding: 0 20px;">
+        Первый запуск может занять 10-15 сек.<br>AI скачивает "мозг" для обработки.
+    </div>
+</div>
 
 <div class="controls">
-    <label class="upload-btn">
-        📸 ЗАГРУЗИТЬ ФОТО
-        <input type="file" id="file-input" accept="image/*" style="display:none">
-    </label>
-    <p style="font-size:12px; color:#666; margin-top:10px;">Бесплатно и без ограничений!</p>
+    <div class="upload-btn">
+        📸 ЗАГРУЗИТЬ ФОТО (AI КТО-ТО)
+        <input type="file" id="file-input" accept="image/*">
+    </div>
+    <p style="font-size: 12px; color: #888; margin-top: 15px;">
+        Двигайте фото пальцем для настройки<br>(手动调整照片位置)
+    </p>
+    <a href="https://www.ozon.ru/cart" id="order-link" style="display:none; background:var(--accent); color:white; padding:18px; border-radius:15px; text-align:center; font-weight:bold; text-decoration:none; margin-top:15px;">🛒 ЗАКАЗАТЬ ШЕДЕВР</a>
 </div>
 
 <script>
     const fileInput = document.getElementById('file-input');
     const userFace = document.getElementById('user-face');
     const loading = document.getElementById('loading');
+    const orderLink = document.getElementById('order-link');
 
     fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -47,31 +60,35 @@
 
         loading.style.display = 'flex';
         try {
-            // 使用 imgly 库在本地进行抠图，不产生任何API费用
-            const blob = await imglyRemoveBackground(file);
+            // 核心修复：使用正确的库调用方式 imgly.backgroundRemoval
+            const blob = await imgly.backgroundRemoval(file);
             userFace.src = URL.createObjectURL(blob);
             userFace.style.display = 'block';
-            userFace.style.top = '75px';
-            userFace.style.left = '75px';
+            userFace.style.top = '80px';
+            userFace.style.left = '90px';
+            orderLink.style.display = 'block';
         } catch (error) {
-            alert("Ошибка загрузки. Попробуйте еще раз.");
+            console.error(error);
+            alert("Ошибка ИИ. Попробуйте еще раз.");
         } finally {
             loading.style.display = 'none';
         }
     });
 
-    // 拖拽逻辑保持不变...
+    // 适配手机的丝滑拖拽
     let isDragging = false, startX, startY, initialX, initialY;
     userFace.addEventListener('touchstart', (e) => {
         isDragging = true;
         startX = e.touches[0].clientX; startY = e.touches[0].clientY;
         initialX = userFace.offsetLeft; initialY = userFace.offsetTop;
-    });
+    }, {passive: true});
+
     document.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         userFace.style.left = (initialX + e.touches[0].clientX - startX) + 'px';
         userFace.style.top = (initialY + e.touches[0].clientY - startY) + 'px';
-    });
+    }, {passive: false});
+
     document.addEventListener('touchend', () => isDragging = false);
 </script>
 </body>
